@@ -135,7 +135,24 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        return self.traverseRecursively(gameState=gameState, agentIdx=self.index, depth=self.depth)[0]
+
+    def traverseRecursively(self, gameState, agentIdx, depth):
+        if depth <= 0 or gameState.isWin() or gameState.isLose():
+            return (Directions.STOP, self.evaluationFunction(gameState))
+
+        policyFn = max if agentIdx == 0 else min
+
+        legalActions = gameState.getLegalActions(agentIdx)
+        successors = [gameState.generateSuccessor(agentIdx, action) for action in legalActions]
+
+        nextAgentIdx = (agentIdx + 1) % gameState.getNumAgents()
+        nextDepth = depth - 1 if nextAgentIdx == 0 else depth
+        scores = [self.traverseRecursively(successor, nextAgentIdx, nextDepth)[1] for successor in successors]
+        
+        optimalAction, optimalScore = policyFn(zip(legalActions, scores), key=lambda tup:tup[1])
+        return optimalAction, optimalScore
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
