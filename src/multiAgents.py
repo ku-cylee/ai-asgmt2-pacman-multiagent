@@ -157,7 +157,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         scores = [self.traverseRecursively(successor, nextAgentIdx, nextDepth)[1] for successor in successors]
 
         getBestOption = max if agentIdx == 0 else min
-        optimalAction, optimalScore = getBestOption(zip(legalActions, scores), key=lambda tup:tup[1])
+        optimalAction, optimalScore = getBestOption(zip(legalActions, scores), key=lambda tup : tup[1])
         return optimalAction, optimalScore
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
@@ -175,14 +175,14 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
     def traverseRecursively(self, gameState, agentIdx, depth, alpha=float('-inf'), beta=float('inf')):
         if depth <= 0 or gameState.isWin() or gameState.isLose():
-            return (None, self.evaluationFunction(gameState))
+            return (Directions.STOP, self.evaluationFunction(gameState))
 
         isMaxMode = agentIdx == 0
         optimalScore = float('-inf') if isMaxMode else float('inf')
         isScoreBetter = (lambda succ, opt : succ > opt) if isMaxMode else (lambda succ, opt : succ < opt)
         doPrune = (lambda a, b, v : v > b) if isMaxMode else (lambda a, b, v : v < a)
-        getNewAlpha = (lambda a, v : max(a, v)) if isMaxMode else (lambda a, v: a)
-        getNewBeta = (lambda b, v: b) if isMaxMode else (lambda b, v : min(b, v))
+        getNewAlpha = (lambda a, v : max(a, v)) if isMaxMode else (lambda a, v : a)
+        getNewBeta = (lambda b, v : b) if isMaxMode else (lambda b, v : min(b, v))
 
         nextAgentIdx = (agentIdx + 1) % gameState.getNumAgents()
         nextDepth = depth - 1 if nextAgentIdx == 0 else depth
