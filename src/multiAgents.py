@@ -143,9 +143,9 @@ class MinimaxAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
 
-        return self.traverseRecursively(gameState=gameState, agentIdx=self.index, depth=self.depth)[0]
+        return self.traverse(gameState=gameState, agentIdx=self.index, depth=self.depth)[0]
 
-    def traverseRecursively(self, gameState, agentIdx, depth):
+    def traverse(self, gameState, agentIdx, depth):
         if depth <= 0 or gameState.isWin() or gameState.isLose():
             return (Directions.STOP, self.evaluationFunction(gameState))
 
@@ -154,7 +154,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
         nextAgentIdx = (agentIdx + 1) % gameState.getNumAgents()
         nextDepth = depth - 1 if nextAgentIdx == 0 else depth
-        scores = [self.traverseRecursively(successor, nextAgentIdx, nextDepth)[1] for successor in successors]
+        scores = [self.traverse(successor, nextAgentIdx, nextDepth)[1] for successor in successors]
 
         getBestOption = max if agentIdx == 0 else min
         optimalAction, optimalScore = getBestOption(zip(legalActions, scores), key=lambda tup : tup[1])
@@ -171,9 +171,9 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
 
-        return self.traverseRecursively(gameState=gameState, agentIdx=self.index, depth=self.depth)[0]
+        return self.traverse(gameState=gameState, agentIdx=self.index, depth=self.depth)[0]
 
-    def traverseRecursively(self, gameState, agentIdx, depth, alpha=float('-inf'), beta=float('inf')):
+    def traverse(self, gameState, agentIdx, depth, alpha=float('-inf'), beta=float('inf')):
         if depth <= 0 or gameState.isWin() or gameState.isLose():
             return (Directions.STOP, self.evaluationFunction(gameState))
 
@@ -189,7 +189,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
         for action in gameState.getLegalActions(agentIdx):
             successor = gameState.generateSuccessor(agentIdx, action)
-            successorScore = self.traverseRecursively(successor, nextAgentIdx, nextDepth, alpha, beta)[1]
+            successorScore = self.traverse(successor, nextAgentIdx, nextDepth, alpha, beta)[1]
 
             if isScoreBetter(successorScore, optimalScore):
                 optimalScore = successorScore
