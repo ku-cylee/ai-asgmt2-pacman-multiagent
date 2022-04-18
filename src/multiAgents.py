@@ -142,16 +142,15 @@ class MinimaxAgent(MultiAgentSearchAgent):
         if depth <= 0 or gameState.isWin() or gameState.isLose():
             return (Directions.STOP, self.evaluationFunction(gameState))
 
-        policyFn = max if agentIdx == 0 else min
-
         legalActions = gameState.getLegalActions(agentIdx)
         successors = [gameState.generateSuccessor(agentIdx, action) for action in legalActions]
 
         nextAgentIdx = (agentIdx + 1) % gameState.getNumAgents()
         nextDepth = depth - 1 if nextAgentIdx == 0 else depth
         scores = [self.traverseRecursively(successor, nextAgentIdx, nextDepth)[1] for successor in successors]
-        
-        optimalAction, optimalScore = policyFn(zip(legalActions, scores), key=lambda tup:tup[1])
+
+        getBestOption = max if agentIdx == 0 else min
+        optimalAction, optimalScore = getBestOption(zip(legalActions, scores), key=lambda tup:tup[1])
         return optimalAction, optimalScore
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
@@ -194,7 +193,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
             alpha = getNewAlpha(alpha, optimalScore)
             beta = getNewBeta(beta, optimalScore)
-        
+
         return optimalAction, optimalScore
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
