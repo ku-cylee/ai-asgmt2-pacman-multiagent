@@ -164,7 +164,38 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        return self.traverseRecursively(gameState=gameState, agentIdx=self.index, depth=self.depth)[0]
+
+    def traverseRecursively(self, gameState, agentIdx, depth, alpha=float('-inf'), beta=float('inf')):
+        if depth <= 0 or gameState.isWin() or gameState.isLose():
+            return (None, self.evaluationFunction(gameState))
+
+        isMaxMode = agentIdx == 0
+        optimalScore = float('-inf') if isMaxMode else float('inf')
+        isScoreBetter = (lambda succ, opt : succ > opt) if isMaxMode else (lambda succ, opt : succ < opt)
+        doPrune = (lambda a, b, v : v > b) if isMaxMode else (lambda a, b, v : v < a)
+        getNewAlpha = (lambda a, v : max(a, v)) if isMaxMode else (lambda a, v: a)
+        getNewBeta = (lambda b, v: b) if isMaxMode else (lambda b, v : min(b, v))
+
+        nextAgentIdx = (agentIdx + 1) % gameState.getNumAgents()
+        nextDepth = depth - 1 if nextAgentIdx == 0 else depth
+
+        for action in gameState.getLegalActions(agentIdx):
+            successor = gameState.generateSuccessor(agentIdx, action)
+            successorScore = self.traverseRecursively(successor, nextAgentIdx, nextDepth, alpha, beta)[1]
+
+            if isScoreBetter(successorScore, optimalScore):
+                optimalScore = successorScore
+                optimalAction = action
+
+            if doPrune(alpha, beta, optimalScore):
+                return action, optimalScore
+
+            alpha = getNewAlpha(alpha, optimalScore)
+            beta = getNewBeta(beta, optimalScore)
+        
+        return optimalAction, optimalScore
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
